@@ -1,0 +1,112 @@
+body {
+  background-color: #595959;
+}
+
+/* ////////////// main container ///////////////// */
+#container {
+  display: block;
+  width: 400px;
+  margin: 0px auto;
+}
+
+/* ////////////// menu ///////////////// */
+#menu {
+  width: 400px;
+  margin-top: 20px;
+  border: 1px solid black;
+}
+
+/* ////////////// info ///////////////// */
+#info__text {
+  color: white;
+}
+
+/* ////////////// category ///////////////// */
+#category {
+  width: 400px;
+  margin-top: 20px;
+  border: 1px solid black;
+}
+
+#category__display {
+  width: 400px;
+  height: auto;
+  margin-top: 20px;
+  border: 1px solid black;
+}
+
+.category__container {
+  border: 1px solid red;
+  cursor: pointer;
+}
+
+.category__title {
+  margin: 0;
+  color: #fff;
+}
+
+.category__date {
+  margin: 0;
+  color: #fff;
+}
+
+.category__info {
+  margin: 0;
+  color: #fff;
+}
+
+/* ////////////// note ///////////////// */
+#note {
+
+  display: none;
+
+  width: 400px;
+  margin-top: 20px;
+  border: 1px solid black;
+}
+
+#note__display {
+  width: 400px;
+  height: auto;
+  margin-top: 20px;
+  border: 1px solid black;
+}
+
+.note__container {
+  border: 1px solid blue;
+}
+
+.note__title {
+  margin: 0;
+  color: #fff;
+}
+
+.note__date {
+  margin: 0;
+  color: #fff;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*  */
