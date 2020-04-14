@@ -8,6 +8,11 @@
 // kategorija moze da ima informacije o broju notes u sebi datumu
 // return moze da bude floating button sa fixed pozicijom
 // neka nota bude malo duza od kategorije u zavisnosti od teksta
+// neka note input ima border ruzicasti ili nesto slicno da se razlikuje
+// neka prvo slovo bude veliko u inputu
+// za dizajn moze neka trakasta pozadina posto izgleda prazno
+// sredi foldere za fajlove, neka ikonice imaju poseban folder
+// spoj css klase i id za category i note, kod se bespotrebno ponavlja
 let allNotesArr = []; let activeCategory; let categoryInput; let noteInput; let noteVisiblity = false;
 
 ///////////////////// getting input ///////////////////////
@@ -68,13 +73,14 @@ function buildCategory() {
 
   allNotesArr.forEach((item, i) => {
 
-    let categoryContainerMain = document.getElementById("category__display");
+    let categoryContainerMain = document.getElementById("categoryList");
 
     let categoryContainerSmall = document.createElement("div");
     categoryContainerSmall.classList.add("category__container");
     categoryContainerSmall.onclick = function() {
+      // console.log(this.children[1].children[0].innerHTML);
       for (var i = 0; i < allNotesArr.length; i++) {
-        if (this.children[1].innerHTML === allNotesArr[i].categoryDate) {
+        if (this.children[1].children[0].innerHTML === allNotesArr[i].categoryDate) {
           // reset active category
           for (var j = 0; j < allNotesArr.length; j++) {
             allNotesArr[j].categoryActive = false;
@@ -93,37 +99,42 @@ function buildCategory() {
     title.classList.add("category__title");
 
     let date = document.createElement("h3");
-    date.innerHTML = item.categoryDate;
+    date.innerHTML = `created at: <span class="category__date__span">${item.categoryDate}</span>`;
     date.classList.add("category__date");
 
     let categoryInfo = document.createElement("h3");
     let noteNumber = 0; let noteCheck = 0;
     for (var k = 0; k < item.notes.length; k++) {
       noteNumber++;
-      if (item.notes[i].noteCheck !== undefined && item.notes[i].noteCheck === true) {
-          noteCheck++;
-      }
+      // sredi notechek, problem je undefined kad se ubaci druga nota u drugoj kategoriji
+      // if (item.notes[i].noteCheck !== "undefined" && item.notes[i].noteCheck === true) {
+      //     noteCheck++;
+      // }
     };
-    categoryInfo.innerHTML = `${noteNumber} notes / ${noteCheck} checked`;
+    categoryInfo.innerHTML =
+    `<span class="category__info__span">
+    ${noteNumber}</span> notes /
+    <span class="category__info__span">${noteCheck}</span> checked`;
     categoryInfo.classList.add("category__info");
 
     let checkbox = document.createElement('input');
     checkbox.type = "checkbox";
+    checkbox.classList.add("category__checkbox");
     checkbox.checked = item.categoryCheck;
     checkbox.onclick = function() {
       for (var i = 0; i < allNotesArr.length; i++) {
-        if (this.parentNode.children[1].innerHTML === allNotesArr[i].categoryDate) {
+        if (this.parentNode.children[1].children[0].innerHTML === allNotesArr[i].categoryDate) {
           allNotesArr[i].categoryCheck = !allNotesArr[i].categoryCheck;
         }
       }
     }
 
     let deleteButton = document.createElement("button");
-    deleteButton.innerHTML = "delete category";
+    deleteButton.innerHTML = '<img class="deleteButtonSvg" src="deleteIcon.svg" alt="deleteSVG">';
     deleteButton.classList.add("category__delete");
     deleteButton.onclick = function () {
       for (var i = 0; i < allNotesArr.length; i++) {
-        if (this.parentNode.children[1].innerHTML === allNotesArr[i].categoryDate) {
+        if (this.parentNode.children[1].children[0].innerHTML === allNotesArr[i].categoryDate) {
           let filteredArray = allNotesArr.filter((item) => item !== allNotesArr[i]);
           allNotesArr = filteredArray;
           buildCategory();
@@ -155,7 +166,7 @@ function buildNote() {
       let notesArray = allNotesArr[i].notes;
       for (var j = 0; j < notesArray.length; j++) {
 
-        let noteContainerMain = document.getElementById("note__display");
+        let noteContainerMain = document.getElementById("noteList");
 
         let noteContainerSmall = document.createElement("div");
         noteContainerSmall.classList.add("note__container");
@@ -170,8 +181,14 @@ function buildNote() {
         date.innerHTML = notesArray[j].noteDate;
         date.classList.add("note__date");
 
+        let titleDateContainer = document.createElement("div");
+        titleDateContainer.classList.add("note__titleDateContainer");
+        titleDateContainer.appendChild(title);
+        titleDateContainer.appendChild(date);
+
         let checkbox = document.createElement('input');
         checkbox.type = "checkbox";
+        checkbox.classList.add("note__checkbox");
         checkbox.checked = notesArray[j].noteCheck;
         checkbox.onclick = function() {
           for (var i = 0; i < allNotesArr.length; i++) {
@@ -190,7 +207,7 @@ function buildNote() {
         }
 
         let deleteButton = document.createElement("button");
-        deleteButton.innerHTML = "delete note";
+        deleteButton.innerHTML = '<img class="deleteButtonSvg" src="deleteIcon.svg" alt="deleteSVG">';
         deleteButton.classList.add("note__delete");
         deleteButton.onclick = function () {
           for (var i = 0; i < allNotesArr.length; i++) {
@@ -211,10 +228,11 @@ function buildNote() {
           }
         }
 
-        noteContainerSmall.appendChild(title);
-        noteContainerSmall.appendChild(date);
-        noteContainerSmall.appendChild(deleteButton);
         noteContainerSmall.appendChild(checkbox);
+        noteContainerSmall.appendChild(titleDateContainer);
+        // noteContainerSmall.appendChild(title);
+        // noteContainerSmall.appendChild(date);
+        noteContainerSmall.appendChild(deleteButton);
         noteContainerMain.appendChild(noteContainerSmall);
       }
     }
@@ -236,8 +254,11 @@ document.getElementById("menu__returnButton").addEventListener("click", function
 // sredi kod nije najbolji // mozda moze switch
 function visibilityFunc() {
   // visibility toggle
-  let categoryVis = document.getElementById("category");
-  let noteVis = document.getElementById("note");
+  let categoryForm = document.getElementById("category");
+  let noteForm = document.getElementById("note");
+  let categoryDisplay = document.getElementById("categoryList");
+  let noteDisplay = document.getElementById("noteList");
+
   let noteToggle = false;
 
   for (var i = 0; i < allNotesArr.length; i++) {
@@ -247,12 +268,16 @@ function visibilityFunc() {
   }
   if (noteToggle === true) {
     // category hidden notes visible
-    categoryVis.style.display = "none";
-    noteVis.style.display = "block";
+    categoryForm.style.display = "none";
+    categoryDisplay.style.display = "none";
+    noteForm.style.display = "block";
+    noteDisplay.style.display = "block";
   } else {
     // category visible notes hidden
-    categoryVis.style.display = "block";
-    noteVis.style.display = "none";
+    categoryForm.style.display = "block";
+    categoryDisplay.style.display = "block";
+    noteForm.style.display = "none";
+    noteDisplay.style.display = "none";
   }
 }
 

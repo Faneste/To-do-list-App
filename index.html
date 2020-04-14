@@ -5,35 +5,42 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>To Do List App</title>
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&display=swap" rel="stylesheet">
   <link href="css.css" rel="stylesheet">
 </head>
 <body>
 
 <div id="container">
 
-  <div id="menu">
-    <button id="menu__returnButton">return</button>
-    <button id="menu__themeButton">dark mode</button>
-  </div>
-
-  <div id="info">
-    <p id="info__text">Info text ide ovde</p>
-  </div>
-
   <div id="category">
     <form id="category__form" autocomplete="off">
-      <textarea placeholder="Write a Category..." type="text" id="category__textarea" name="submitCategoryInput"></textarea><br>
-      <input type="submit" value="Save category" id="category__submitbutton">
+      <textarea placeholder="Write a Category..." type="text" id="category__textarea" name="submitCategoryInput"></textarea>
+      <input type="submit" value="+" id="category__submitbutton">
     </form>
-    <div id="category__display"></div>
   </div>
+
 
   <div id="note">
     <form id="note__form" autocomplete="off">
-      <textarea placeholder="Write a Note..." type="text" id="note__textarea" name="submitNoteInput"></textarea><br>
-      <input type="submit" value="Save note" id="note__submitbutton">
+      <textarea placeholder="Write a Note..." type="text" id="note__textarea" name="submitNoteInput"></textarea>
+      <input type="submit" value="+" id="note__submitbutton">
     </form>
-    <div id="note__display"></div>
+  </div>
+
+  <div id="hrDivContainer"><div id="hrDivContainer__hr"></div></div>
+
+  <div id="menu">
+    <div id="info">
+      <p id="info__text">Info text ide ovde</p></div>
+      <button id="menu__themeButton"><img id="themeButtonSvg" src="themeIcon.svg" alt="themeSVG"></button>
+    <button id="menu__returnButton"><img id="backButtonSvg" src="backIcon.svg" alt="backSVG"></button>
+  </div>
+
+  <div id="categoryList">
+    <h3 id="categoryList__title">Categories</h3>
+  </div>
+  <div id="noteList">
+    <h3 id="noteList__title">Notes</h3>
   </div>
 
 </div>
