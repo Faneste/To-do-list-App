@@ -29,7 +29,7 @@ body {
   box-sizing: border-box;         /* Opera/IE 8+ */
   display: grid;
   grid-template-columns: auto;
-  grid-auto-rows: 70px 25px 50px auto;
+  grid-auto-rows: 70px 25px 60px auto;
   grid-template-areas:
   "input"
   "hr"
@@ -178,9 +178,14 @@ body {
   /* vertical-align: top; */
   margin: 0;
   padding: 0;
-  padding-top: 5px;
+  /* padding-top: 5px; */
   padding-left: 5px;
   color: var(--color4);
+  font-size: 0.9em;
+}
+
+.infoTextColorSPan {
+  color: var(--color6);
 }
 
 #menu__themeButton {
@@ -277,7 +282,7 @@ body {
 
 .category__checkbox {
   position: absolute;
-  top: 5px;
+  top: 10px;
   right: 5px;
   width: 20px;
   height: 20px;
@@ -289,7 +294,7 @@ input[type=checkbox] {
 
 .category__delete {
   position: absolute;
-  top: 30px;
+  top: 40px;
   right: 0px;
 
   width: 40px;
@@ -306,6 +311,7 @@ input[type=checkbox] {
 /* ////////////// note list ///////////////// */
 
 #noteList {
+  display: none;
   grid-area: notes;
   height: auto;
   margin-top: 10px;
@@ -391,7 +397,18 @@ input[type=checkbox] {
 
 .note__delete {
   position: absolute;
-  top: 30px;
+  top: 32px;
+  right: 0px;
+
+  width: 40px;
+  height: 40px;
+  background: none;
+  border: none;
+}
+
+.note__color {
+  position: absolute;
+  top: 0px;
   right: 0px;
 
   width: 40px;
@@ -401,6 +418,11 @@ input[type=checkbox] {
 }
 
 .deleteButtonSvg {
+  width: 100%;
+  height: 100%;
+}
+
+.colorButtonSvg {
   width: 100%;
   height: 100%;
 }

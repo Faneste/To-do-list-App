@@ -13,6 +13,8 @@
 // za dizajn moze neka trakasta pozadina posto izgleda prazno
 // sredi foldere za fajlove, neka ikonice imaju poseban folder
 // spoj css klase i id za category i note, kod se bespotrebno ponavlja
+// nek se ne vidi back dugme u kategorijama / stavi u visibility function
+// neak prikaze no notes yet ili categories
 let allNotesArr = []; let activeCategory; let categoryInput; let noteInput; let noteVisiblity = false;
 
 ///////////////////// getting input ///////////////////////
@@ -206,10 +208,18 @@ function buildNote() {
           }
         }
 
+        let colorButton = document.createElement("button");
+        colorButton.innerHTML = '<img class="colorButtonSvg" src="colorIcon.svg" alt="colorSVG">';
+        colorButton.classList.add("note__color");
+        colorButton.onclick = function () {
+          console.log("change note color");
+        }
+
         let deleteButton = document.createElement("button");
         deleteButton.innerHTML = '<img class="deleteButtonSvg" src="deleteIcon.svg" alt="deleteSVG">';
         deleteButton.classList.add("note__delete");
         deleteButton.onclick = function () {
+          console.log("delete");
           for (var i = 0; i < allNotesArr.length; i++) {
             if (allNotesArr[i].categoryActive === true) {
 
@@ -217,7 +227,7 @@ function buildNote() {
               let notesArray = allNotesArr[i].notes;
 
               for (var j = 0; j < notesArray.length; j++) {
-                if (this.parentNode.children[1].innerHTML === notesArray[j].noteDate) {
+                if (this.parentNode.children[1].children[1].innerHTML === notesArray[j].noteDate) {
                   let filteredArray = notesArray.filter((item) => item !== notesArray[j]);
                   notesArray = filteredArray;
                   allNotesArr[i].notes = notesArray;
@@ -233,6 +243,7 @@ function buildNote() {
         // noteContainerSmall.appendChild(title);
         // noteContainerSmall.appendChild(date);
         noteContainerSmall.appendChild(deleteButton);
+        noteContainerSmall.appendChild(colorButton);
         noteContainerMain.appendChild(noteContainerSmall);
       }
     }
@@ -286,12 +297,29 @@ function visibilityFunc() {
 function infoFunc() {
   let infoText = document.getElementById("info__text");
   let categoryNumber = 0;
+  let categoryCheckedNumber = 0;
+  let categoryLastDateMade = 0;
   let notesNumber = 0;
 
   for (var i = 0; i < allNotesArr.length; i++) {
+    // getting number of categories
     categoryNumber++;
+    if (allNotesArr[i].categoryCheck === true) {
+      categoryCheckedNumber++;
+    }
+    // getting last date of categories
+    let lastDate = allNotesArr[i].categoryDate.split(':').join('');
+    if (lastDate > categoryLastDateMade) {
+      categoryLastDateMade = lastDate;
+    }
+    // sredi formatiranje datuma kad budes gore sredio datum
+    let output = categoryLastDateMade.substring(0, 2) + ":" + categoryLastDateMade.substring(2);
+    console.log(output);
+
+
+
     if (allNotesArr[i].categoryActive === true) {
-      // info about notes
+      // html info about notes
       for (var i = 0; i < allNotesArr.length; i++) {
         if (allNotesArr[i].categoryActive === true) {
           for (var j = 0; j < allNotesArr[i].notes.length; j++) {
@@ -299,11 +327,16 @@ function infoFunc() {
           }
         }
       }
-      infoText.innerHTML = `number of notes is ${notesNumber}`;
+      infoText.innerHTML = `number of notes  ${notesNumber}`;
     }
     else if (allNotesArr[i].categoryActive !== true) {
-      // info about categories
-      infoText.innerHTML = `number of categories is ${categoryNumber}`;
+      // html info about categories
+      infoText.innerHTML =
+      `<span class="infoTextColorSPan">${categoryNumber}</span>
+      categories, with
+      <span class="infoTextColorSPan">${categoryCheckedNumber}</span>
+      checked, last one made
+      <span class="infoTextColorSPan">${categoryLastDateMade}</span>`;
     }
   }
 }
