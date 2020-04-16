@@ -14,7 +14,7 @@
 // sredi foldere za fajlove, neka ikonice imaju poseban folder
 // spoj css klase i id za category i note, kod se bespotrebno ponavlja
 // nek se ne vidi back dugme u kategorijama / stavi u visibility function
-// neak prikaze no notes yet ili categories
+// neka prikaze no notes yet ili categories
 let allNotesArr = []; let activeCategory; let categoryInput; let noteInput; let noteVisiblity = false;
 
 ///////////////////// getting input ///////////////////////
@@ -23,11 +23,23 @@ let allNotesArr = []; let activeCategory; let categoryInput; let noteInput; let 
 document.getElementById("category__submitbutton").addEventListener("click", function(event){
   event.preventDefault();
   categoryInput = document.getElementById("category__textarea").value;
+  categoryInput = categoryInput.charAt(0).toUpperCase() + categoryInput.slice(1);
 
+  // time formatting, add zero if time is 10:2:22 for example
   time = new Date();
+  let hours = (time.getHours()<10?'0':'') + time.getHours();
+  let minutes = (time.getMinutes()<10?'0':'') + time.getMinutes();
+  let seconds = (time.getSeconds()<10?'0':'') + time.getSeconds();
+  // date formatting
+  let dd = String(time.getDate()).padStart(2, '0');
+  let mm = String(time.getMonth() + 1).padStart(2, '0');
+  let yyyy = time.getFullYear();
+  let date = dd + '/' + mm + '/' + yyyy;
+
   allNotesArr.push({
     categoryTitle:categoryInput,
-    categoryDate: time.getHours() + ":" + time.getMinutes() + ":" + time.getSeconds(),
+    categoryTime: hours + ":" + minutes + ":" + seconds,
+    categoryDate: date,
     categoryActive: false,
     categoryCheck: false,
     notes: []
@@ -81,8 +93,27 @@ function buildCategory() {
     categoryContainerSmall.classList.add("category__container");
     categoryContainerSmall.onclick = function() {
       // console.log(this.children[1].children[0].innerHTML);
+      // for (var i = 0; i < allNotesArr.length; i++) {
+      //   if (this.children[1].children[0].innerHTML === allNotesArr[i].categoryTime) {
+      //     // reset active category
+      //     for (var j = 0; j < allNotesArr.length; j++) {
+      //       allNotesArr[j].categoryActive = false;
+      //     }
+      //     // assign active category
+      //     allNotesArr[i].categoryActive = true;
+      //     buildNote();
+      //   }
+      // }
+      // visibilityFunc();
+      // infoFunc();
+    }
+
+    let clickDiv = document.createElement("div");
+    clickDiv.classList.add("category__clickDiv");
+    clickDiv.onclick = function() {
+      console.log(this.parentNode.children[2].children[0].innerHTML);
       for (var i = 0; i < allNotesArr.length; i++) {
-        if (this.children[1].children[0].innerHTML === allNotesArr[i].categoryDate) {
+        if (this.parentNode.children[2].children[0].innerHTML === allNotesArr[i].categoryTime) {
           // reset active category
           for (var j = 0; j < allNotesArr.length; j++) {
             allNotesArr[j].categoryActive = false;
@@ -96,12 +127,17 @@ function buildCategory() {
       infoFunc();
     }
 
+
+
     let title = document.createElement("h2");
     title.innerHTML = item.categoryTitle;
     title.classList.add("category__title");
 
     let date = document.createElement("h3");
-    date.innerHTML = `created at: <span class="category__date__span">${item.categoryDate}</span>`;
+    date.innerHTML = `created at
+      <span class="category__date__span">${item.categoryTime}</span>, on
+      <span class="category__date__span">${item.categoryDate}</span>
+      `;
     date.classList.add("category__date");
 
     let categoryInfo = document.createElement("h3");
@@ -125,10 +161,11 @@ function buildCategory() {
     checkbox.checked = item.categoryCheck;
     checkbox.onclick = function() {
       for (var i = 0; i < allNotesArr.length; i++) {
-        if (this.parentNode.children[1].children[0].innerHTML === allNotesArr[i].categoryDate) {
+        if (this.parentNode.children[2].children[0].innerHTML === allNotesArr[i].categoryTime) {
           allNotesArr[i].categoryCheck = !allNotesArr[i].categoryCheck;
         }
       }
+      infoFunc();
     }
 
     let deleteButton = document.createElement("button");
@@ -136,14 +173,16 @@ function buildCategory() {
     deleteButton.classList.add("category__delete");
     deleteButton.onclick = function () {
       for (var i = 0; i < allNotesArr.length; i++) {
-        if (this.parentNode.children[1].children[0].innerHTML === allNotesArr[i].categoryDate) {
+        if (this.parentNode.children[2].children[0].innerHTML === allNotesArr[i].categoryTime) {
           let filteredArray = allNotesArr.filter((item) => item !== allNotesArr[i]);
           allNotesArr = filteredArray;
           buildCategory();
+          infoFunc();
         }
       }
     };
 
+    categoryContainerSmall.appendChild(clickDiv);
     categoryContainerSmall.appendChild(title);
     categoryContainerSmall.appendChild(date);
     categoryContainerSmall.appendChild(deleteButton);
@@ -178,9 +217,12 @@ function buildNote() {
         let title = document.createElement("h2");
         title.innerHTML = notesArray[j].noteText;
         title.classList.add("note__title");
+        if (notesArray[j].noteCheck === true) {
+          title.style.textDecoration = "line-through";
+        }
 
         let date = document.createElement("h3");
-        date.innerHTML = notesArray[j].noteDate;
+        date.innerHTML = `made at <span class="note__date__span">${notesArray[j].noteDate}</span>`;
         date.classList.add("note__date");
 
         let titleDateContainer = document.createElement("div");
@@ -193,6 +235,7 @@ function buildNote() {
         checkbox.classList.add("note__checkbox");
         checkbox.checked = notesArray[j].noteCheck;
         checkbox.onclick = function() {
+          // console.log(this.parentNode.children[1].children[1].children[0].innerHTML);
           for (var i = 0; i < allNotesArr.length; i++) {
             if (allNotesArr[i].categoryActive === true) {
 
@@ -200,12 +243,14 @@ function buildNote() {
               let notesArray = allNotesArr[i].notes;
 
               for (var j = 0; j < notesArray.length; j++) {
-                if (this.parentNode.children[1].innerHTML === notesArray[j].noteDate) {
+                if (this.parentNode.children[1].children[1].children[0].innerHTML === notesArray[j].noteDate) {
                   notesArray[j].noteCheck = !notesArray[j].noteCheck;
                 }
               }
             }
           }
+          buildNote();
+          infoFunc();
         }
 
         let colorButton = document.createElement("button");
@@ -219,7 +264,7 @@ function buildNote() {
         deleteButton.innerHTML = '<img class="deleteButtonSvg" src="deleteIcon.svg" alt="deleteSVG">';
         deleteButton.classList.add("note__delete");
         deleteButton.onclick = function () {
-          console.log("delete");
+          console.log(this.parentNode.children[1].children[1].children[0].innerHTML);
           for (var i = 0; i < allNotesArr.length; i++) {
             if (allNotesArr[i].categoryActive === true) {
 
@@ -227,7 +272,7 @@ function buildNote() {
               let notesArray = allNotesArr[i].notes;
 
               for (var j = 0; j < notesArray.length; j++) {
-                if (this.parentNode.children[1].children[1].innerHTML === notesArray[j].noteDate) {
+                if (this.parentNode.children[1].children[1].children[0].innerHTML === notesArray[j].noteDate) {
                   let filteredArray = notesArray.filter((item) => item !== notesArray[j]);
                   notesArray = filteredArray;
                   allNotesArr[i].notes = notesArray;
@@ -298,6 +343,7 @@ function infoFunc() {
   let infoText = document.getElementById("info__text");
   let categoryNumber = 0;
   let categoryCheckedNumber = 0;
+  let categoryLastTimeMade = 0;
   let categoryLastDateMade = 0;
   let notesNumber = 0;
 
@@ -307,16 +353,22 @@ function infoFunc() {
     if (allNotesArr[i].categoryCheck === true) {
       categoryCheckedNumber++;
     }
+
     // getting last date of categories
-    let lastDate = allNotesArr[i].categoryDate.split(':').join('');
-    if (lastDate > categoryLastDateMade) {
+    let lastTime = allNotesArr[i].categoryTime.split(':').join('');
+    let lastDate = allNotesArr[i].categoryDate.split('/').join('');
+    if (lastDate + lastTime > categoryLastDateMade) {
+      categoryLastTimeMade = lastTime;
       categoryLastDateMade = lastDate;
     }
-    // sredi formatiranje datuma kad budes gore sredio datum
-    let output = categoryLastDateMade.substring(0, 2) + ":" + categoryLastDateMade.substring(2);
-    console.log(output);
+    // date and time formattingd
+    let timeOutput =
+      categoryLastTimeMade.substring(0, 2) + ":" + categoryLastTimeMade.substring(2,4) + ":"
+      + categoryLastTimeMade.substring(4,8);
 
-
+    let dateOutput =
+      categoryLastDateMade.substring(0, 2) + "/" + categoryLastDateMade.substring(2,4) + "/"
+      + categoryLastDateMade.substring(4,8);
 
     if (allNotesArr[i].categoryActive === true) {
       // html info about notes
@@ -335,8 +387,10 @@ function infoFunc() {
       `<span class="infoTextColorSPan">${categoryNumber}</span>
       categories, with
       <span class="infoTextColorSPan">${categoryCheckedNumber}</span>
-      checked, last one made
-      <span class="infoTextColorSPan">${categoryLastDateMade}</span>`;
+      checked, last one at
+      <span class="infoTextColorSPan">${timeOutput}</span>
+      on
+      <span class="infoTextColorSPan">${dateOutput}</span>`;
     }
   }
 }
