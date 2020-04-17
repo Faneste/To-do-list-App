@@ -15,7 +15,9 @@
 // spoj css klase i id za category i note, kod se bespotrebno ponavlja
 // nek se ne vidi back dugme u kategorijama / stavi u visibility function
 // neka prikaze no notes yet ili categories
-let allNotesArr = []; let activeCategory; let categoryInput; let noteInput; let noteVisiblity = false;
+// neka notes kada se klikne na celo polje da checkmarkuje, da ne mora tacno na checkmark da se klikce
+// neka ima loading screen za telefone sa logoom
+let allNotesArr = []; let activeCategory; let categoryInput; let noteInput; let noteVisiblity = false;let darkTheme = false;
 
 ///////////////////// getting input ///////////////////////
 
@@ -36,40 +38,63 @@ document.getElementById("category__submitbutton").addEventListener("click", func
   let yyyy = time.getFullYear();
   let date = dd + '/' + mm + '/' + yyyy;
 
-  allNotesArr.push({
-    categoryTitle:categoryInput,
-    categoryTime: hours + ":" + minutes + ":" + seconds,
-    categoryDate: date,
-    categoryActive: false,
-    categoryCheck: false,
-    notes: []
-  });
-  buildCategory();
-  buildNote();
-  infoFunc();
+  // if there's an text in input
+  if (categoryInput !== "") {
+    allNotesArr.push({
+      categoryTitle:categoryInput,
+      categoryTime: hours + ":" + minutes + ":" + seconds,
+      categoryDate: date,
+      categoryActive: false,
+      categoryCheck: false,
+      notes: []
+    });
+    buildCategory();
+    buildNote();
+    infoFunc();
+  } else {
+    // flash input if empty
+    var t = setInterval(function () {
+    var ele = document.getElementById("category__textarea");
+      ele.style.visibility  = (ele.style.visibility  == "hidden" ? "" : "hidden");
+    }, 100);
+    setTimeout(function( ) { clearInterval( t ); }, 600);
+  }
+  document.getElementById("category__textarea").value = "";
 });
 
 // note input
 document.getElementById("note__submitbutton").addEventListener("click", function(event){
   event.preventDefault();
   noteInput = document.getElementById("note__textarea").value;
+  noteInput = noteInput.charAt(0).toUpperCase() + noteInput.slice(1);
   let noteTime = new Date();
 
   let noteInputObject = {
     noteText: noteInput,
     noteDate: noteTime.getHours() + ":" + noteTime.getMinutes() + ":" + noteTime.getSeconds(),
     noteCheck: false,
-    noteColor: "default"
+    noteActiveColor: "#d2315f",
+    noteColors: ["#0060af", "#29b013", "#c51021", "#e87d0b"]
   }
 
-  for (var i = 0; i < allNotesArr.length; i++) {
-    if (allNotesArr[i].categoryActive === true) {
-      allNotesArr[i].notes.push(noteInputObject);
+  if (noteInput !== "") {
+    for (var i = 0; i < allNotesArr.length; i++) {
+      if (allNotesArr[i].categoryActive === true) {
+        allNotesArr[i].notes.push(noteInputObject);
+      }
     }
+    buildCategory();
+    buildNote();
+    infoFunc();
+  } else {
+    // flash input if empty
+    var t = setInterval(function () {
+    var ele = document.getElementById("note__textarea");
+      ele.style.visibility  = (ele.style.visibility  == "hidden" ? "" : "hidden");
+    }, 100);
+    setTimeout(function( ) { clearInterval( t ); }, 600);
   }
-  buildCategory();
-  buildNote();
-  infoFunc();
+  document.getElementById("note__textarea").value = "";
 });
 
 ///////////////////// building html ///////////////////////
@@ -91,27 +116,11 @@ function buildCategory() {
 
     let categoryContainerSmall = document.createElement("div");
     categoryContainerSmall.classList.add("category__container");
-    categoryContainerSmall.onclick = function() {
-      // console.log(this.children[1].children[0].innerHTML);
-      // for (var i = 0; i < allNotesArr.length; i++) {
-      //   if (this.children[1].children[0].innerHTML === allNotesArr[i].categoryTime) {
-      //     // reset active category
-      //     for (var j = 0; j < allNotesArr.length; j++) {
-      //       allNotesArr[j].categoryActive = false;
-      //     }
-      //     // assign active category
-      //     allNotesArr[i].categoryActive = true;
-      //     buildNote();
-      //   }
-      // }
-      // visibilityFunc();
-      // infoFunc();
-    }
 
     let clickDiv = document.createElement("div");
     clickDiv.classList.add("category__clickDiv");
     clickDiv.onclick = function() {
-      console.log(this.parentNode.children[2].children[0].innerHTML);
+      // console.log(this.parentNode.children[2].children[0].innerHTML);
       for (var i = 0; i < allNotesArr.length; i++) {
         if (this.parentNode.children[2].children[0].innerHTML === allNotesArr[i].categoryTime) {
           // reset active category
@@ -126,8 +135,6 @@ function buildCategory() {
       visibilityFunc();
       infoFunc();
     }
-
-
 
     let title = document.createElement("h2");
     title.innerHTML = item.categoryTitle;
@@ -220,6 +227,7 @@ function buildNote() {
         if (notesArray[j].noteCheck === true) {
           title.style.textDecoration = "line-through";
         }
+        title.style.color = notesArray[j].noteActiveColor;
 
         let date = document.createElement("h3");
         date.innerHTML = `made at <span class="note__date__span">${notesArray[j].noteDate}</span>`;
@@ -235,7 +243,6 @@ function buildNote() {
         checkbox.classList.add("note__checkbox");
         checkbox.checked = notesArray[j].noteCheck;
         checkbox.onclick = function() {
-          // console.log(this.parentNode.children[1].children[1].children[0].innerHTML);
           for (var i = 0; i < allNotesArr.length; i++) {
             if (allNotesArr[i].categoryActive === true) {
 
@@ -256,15 +263,35 @@ function buildNote() {
         let colorButton = document.createElement("button");
         colorButton.innerHTML = '<img class="colorButtonSvg" src="colorIcon.svg" alt="colorSVG">';
         colorButton.classList.add("note__color");
-        colorButton.onclick = function () {
-          console.log("change note color");
+        colorButton.onclick = function() {
+          this.parentNode.children[4].style.display = this.parentNode.children[4].style.display === 'block' ? '' : 'block';
+        }
+
+        let colorButtonContainer = document.createElement("div");
+        colorButtonContainer.classList.add("colorButtonContainer");
+        colorButtonContainer.id = "noteDropdown";
+
+        // building color divs to choose from
+        for (var k = 0; k < notesArray[j].noteColors.length; k++) {
+          let colorButtonColors = document.createElement("div");
+          colorButtonColors.style.backgroundColor  = notesArray[j].noteColors[k];
+          colorButtonColors.classList.add("colorButtonColors");
+          colorButtonContainer.appendChild(colorButtonColors);
+          colorButtonColors.onclick = function () {
+            for (var l = 0; l < notesArray.length; l++) {
+              if (this.parentNode.parentNode.children[1].children[1].children[0].innerHTML === notesArray[l].noteDate) {
+                notesArray[l].noteActiveColor = this.style.backgroundColor;
+              }
+            }
+            buildNote();
+          }
         }
 
         let deleteButton = document.createElement("button");
         deleteButton.innerHTML = '<img class="deleteButtonSvg" src="deleteIcon.svg" alt="deleteSVG">';
         deleteButton.classList.add("note__delete");
         deleteButton.onclick = function () {
-          console.log(this.parentNode.children[1].children[1].children[0].innerHTML);
+          // console.log(this.parentNode.children[1].children[1].children[0].innerHTML);
           for (var i = 0; i < allNotesArr.length; i++) {
             if (allNotesArr[i].categoryActive === true) {
 
@@ -285,11 +312,10 @@ function buildNote() {
 
         noteContainerSmall.appendChild(checkbox);
         noteContainerSmall.appendChild(titleDateContainer);
-        // noteContainerSmall.appendChild(title);
-        // noteContainerSmall.appendChild(date);
         noteContainerSmall.appendChild(deleteButton);
         noteContainerSmall.appendChild(colorButton);
         noteContainerMain.appendChild(noteContainerSmall);
+        noteContainerSmall.appendChild(colorButtonContainer);
       }
     }
   }
@@ -398,12 +424,78 @@ function infoFunc() {
 ///////////////////// dark/light theme toggle ///////////////////////
 
 document.getElementById("menu__themeButton").addEventListener("click", function(event) {
-  console.log("dark light theme");
+
+  darkTheme = !darkTheme;
+  if (darkTheme) {
+    document.documentElement.style.setProperty('--color1', '#515151');
+    document.documentElement.style.setProperty('--color2', '#000000');
+    document.documentElement.style.setProperty('--color3', '#d9d9d9');
+    document.documentElement.style.setProperty('--color4', '#f4f4f4');
+    document.documentElement.style.setProperty('--color5', '#ffffff');
+    document.documentElement.style.setProperty('--color6', '#ed6088');
+    // invert svg icons so that they are visible
+    document.getElementById("themeButtonSvg").style.filter = "invert(100%)";
+    document.getElementById("backButtonSvg").style.filter = "invert(100%)";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // promeni src i updejtuj funkciju kad se napravi nova kategorija ili nota
+
+
+    let categoryDelete = document.getElementsByClassName("deleteButtonSvg");
+    let noteDelete = document.getElementsByClassName("deleteButtonSvg");
+    for (var i = 0; i < categoryDelete.length; i++) {
+      categoryDelete[i].style.filter = "invert(100%)";
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  }
+  if (!darkTheme) {
+    document.documentElement.style.setProperty('--color1', '#ffffff');
+    document.documentElement.style.setProperty('--color2', '#f4f4f4');
+    document.documentElement.style.setProperty('--color3', '#d9d9d9');
+    document.documentElement.style.setProperty('--color4', '#515151');
+    document.documentElement.style.setProperty('--color5', '#000000');
+    document.documentElement.style.setProperty('--color6', '#d2315f');
+    // reset the invert filter
+    document.getElementById("themeButtonSvg").style.filter = "invert(0%)";
+    document.getElementById("backButtonSvg").style.filter = "invert(0%)";
+  }
+
 })
-
-
-
-
 
 
 
