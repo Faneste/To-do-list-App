@@ -1,7 +1,7 @@
 /* ne menja dimenzije elemenata kad se dodaje border, padding i ostale */
 html {
   box-sizing: border-box;
-  min-width: 300px;
+  min-width: 320px;
 }
 /* uklanja default padding i margine */
 body {
@@ -96,7 +96,6 @@ body {
 #note {
   grid-area: input;
   display: none;
-  /* border: 1px solid black; */
 }
 
 #note__form {
@@ -167,7 +166,6 @@ body {
 /* ////////////// menu ///////////////// */
 #menu {
   grid-area: info;
-  /* border: 1px solid black; */
 }
 
 /* ////////////// info ///////////////// */
@@ -182,10 +180,10 @@ body {
 
 #info__text {
   /* display: inline-block; */
-  /* vertical-align: top; */
+  vertical-align: top;
   margin: 0;
   padding: 0;
-  /* padding-top: 5px; */
+  padding-top: 5px;
   padding-left: 5px;
   color: var(--color4);
   font-size: 0.8em;
@@ -219,15 +217,11 @@ body {
 
 #backButtonSvg {
   width: 80px;
-  /* height: 50%; */
-  /* padding-right: 10px; */
 }
 
 #themeButtonSvg {
   width: 50px;
   fill-color: blue;
-  /* height: 90%; */
-  /* padding-right: 10px; */
 }
 
 /* ////////////// category list ///////////////// */
@@ -329,7 +323,6 @@ input[type=checkbox] {
   grid-area: notes;
   height: auto;
   margin-top: 10px;
-  /* border: 1px solid blue; */
   overflow: hidden;
   background-color: var(--color1);
   border-radius: var(--borderRadius);
@@ -353,33 +346,27 @@ input[type=checkbox] {
   padding-bottom: 20px;
 }
 
-              .note__titleDateContainer {
-                display: inline-block;
-                vertical-align:top;
-                margin: 0;
-                /* margin-top: -20px; */
-                margin-left: 25px;
-              }
+.note__titleDateContainer {
+  display: inline-block;
+  width: 60%;
+  vertical-align:top;
+  margin: 0;
+  margin-left: 25px;
+}
 
-              .note__title {
-                /* display: inline-block;
-                vertical-align:top;
-                margin: 0;
-                margin-left: 25px; */
-                font-weight: 400;
-                font-size: 1.3em;
-                margin: 0;
-              }
+.note__title {
+  font-weight: 400;
+  font-size: 1.3em;
+  margin: 0;
+  overflow-wrap: break-word;
+}
 
-              .note__date {
-                /* position: relative;
-                display: inline-block; */
-                /* vertical-align:top; */
-                margin: 0;
-                font-weight: 500;
-                font-size: 0.9em;
-                color: var(--color4);
-              }
+.note__date {
+  margin: 0;
+  font-weight: 500;
+  font-size: 0.9em;
+  color: var(--color4);
+}
 
 .note__date__span {
   color: var(--color6);
@@ -400,18 +387,18 @@ input[type=checkbox] {
   color: var(--color6);
 }
 
-            .note__checkbox {
-              /* position: absolute; */
-              margin-top: 20px;
-              margin-left: 20px;
-              width: 20px;
-              height: 20px;
-            }
+.note__checkbox {
+  /* position: absolute; */
+  margin-top: 20px;
+  margin-left: 20px;
+  width: 20px;
+  height: 20px;
+}
 
-            .note__checkbox[type=checkbox] {
+.note__checkbox[type=checkbox] {
 
-              transform: scale(3);
-            }
+  transform: scale(3);
+}
 
 .note__delete {
   position: absolute;
@@ -445,24 +432,9 @@ input[type=checkbox] {
   height: 100%;
 }
 
-/* note color change menu toggle */
-
-/* .note__color {
-
-} */
-
-/* .dropdown {
-  position: relative;
-  display: inline-block;
-} */
-
 .colorButtonContainer {
   display: none;
-  /* border-top: 3px solid var(--color6); */
   text-align: center;
-  /* position: absolute; */
-  /* background-color: salmon; */
-  /* overflow: auto; */
   z-index: 1;
 }
 

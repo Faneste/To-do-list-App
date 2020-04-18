@@ -17,7 +17,9 @@
 // neka prikaze no notes yet ili categories
 // neka notes kada se klikne na celo polje da checkmarkuje, da ne mora tacno na checkmark da se klikce
 // neka ima loading screen za telefone sa logoom
-let allNotesArr = []; let activeCategory; let categoryInput; let noteInput; let noteVisiblity = false;let darkTheme = false;
+// sredi time kod, ima ga na dva mesta, stavi u jednu funk i da returnuje preko attr vreme (mozda kao uproscen  string)
+// moze i flash input da se extraktuje u posebnu funkciju
+let allNotesArr = []; let activeCategory; let categoryInput; let noteInput; let darkTheme = false; let noteToggle;
 
 ///////////////////// getting input ///////////////////////
 
@@ -44,8 +46,8 @@ document.getElementById("category__submitbutton").addEventListener("click", func
       categoryTitle:categoryInput,
       categoryTime: hours + ":" + minutes + ":" + seconds,
       categoryDate: date,
-      categoryActive: false,
       categoryCheck: false,
+      categoryActive: false,
       notes: []
     });
     buildCategory();
@@ -67,11 +69,22 @@ document.getElementById("note__submitbutton").addEventListener("click", function
   event.preventDefault();
   noteInput = document.getElementById("note__textarea").value;
   noteInput = noteInput.charAt(0).toUpperCase() + noteInput.slice(1);
-  let noteTime = new Date();
+
+  // time formatting, add zero if time is 10:2:22 for example
+  time = new Date();
+  let hours = (time.getHours()<10?'0':'') + time.getHours();
+  let minutes = (time.getMinutes()<10?'0':'') + time.getMinutes();
+  let seconds = (time.getSeconds()<10?'0':'') + time.getSeconds();
+  // date formatting
+  let dd = String(time.getDate()).padStart(2, '0');
+  let mm = String(time.getMonth() + 1).padStart(2, '0');
+  let yyyy = time.getFullYear();
+  let date = dd + '/' + mm + '/' + yyyy;
 
   let noteInputObject = {
     noteText: noteInput,
-    noteDate: noteTime.getHours() + ":" + noteTime.getMinutes() + ":" + noteTime.getSeconds(),
+    noteTime: hours + ":" + minutes + ":" + seconds,
+    noteDate: date,
     noteCheck: false,
     noteActiveColor: "#d2315f",
     noteColors: ["#0060af", "#29b013", "#c51021", "#e87d0b"]
@@ -177,7 +190,7 @@ function buildCategory() {
 
     let deleteButton = document.createElement("button");
     deleteButton.innerHTML = '<img class="deleteButtonSvg" src="deleteIcon.svg" alt="deleteSVG">';
-    deleteButton.classList.add("category__delete");
+    deleteButton.classList.add("category__delete", "svg");
     deleteButton.onclick = function () {
       for (var i = 0; i < allNotesArr.length; i++) {
         if (this.parentNode.children[2].children[0].innerHTML === allNotesArr[i].categoryTime) {
@@ -197,6 +210,7 @@ function buildCategory() {
     categoryContainerSmall.appendChild(categoryInfo); // changing order makes clicking not work for some reason
     categoryContainerMain.appendChild(categoryContainerSmall);
   });
+  changeTheme();
 }
 
 function buildNote() {
@@ -230,7 +244,9 @@ function buildNote() {
         title.style.color = notesArray[j].noteActiveColor;
 
         let date = document.createElement("h3");
-        date.innerHTML = `made at <span class="note__date__span">${notesArray[j].noteDate}</span>`;
+        date.innerHTML = `made at
+          <span class="note__date__span">${notesArray[j].noteTime}</span> on
+          <span class="note__date__span">${notesArray[j].noteDate}</span>`;
         date.classList.add("note__date");
 
         let titleDateContainer = document.createElement("div");
@@ -250,7 +266,7 @@ function buildNote() {
               let notesArray = allNotesArr[i].notes;
 
               for (var j = 0; j < notesArray.length; j++) {
-                if (this.parentNode.children[1].children[1].children[0].innerHTML === notesArray[j].noteDate) {
+                if (this.parentNode.children[1].children[1].children[0].innerHTML === notesArray[j].noteTime) {
                   notesArray[j].noteCheck = !notesArray[j].noteCheck;
                 }
               }
@@ -262,7 +278,7 @@ function buildNote() {
 
         let colorButton = document.createElement("button");
         colorButton.innerHTML = '<img class="colorButtonSvg" src="colorIcon.svg" alt="colorSVG">';
-        colorButton.classList.add("note__color");
+        colorButton.classList.add("note__color", "svg");
         colorButton.onclick = function() {
           this.parentNode.children[4].style.display = this.parentNode.children[4].style.display === 'block' ? '' : 'block';
         }
@@ -279,7 +295,7 @@ function buildNote() {
           colorButtonContainer.appendChild(colorButtonColors);
           colorButtonColors.onclick = function () {
             for (var l = 0; l < notesArray.length; l++) {
-              if (this.parentNode.parentNode.children[1].children[1].children[0].innerHTML === notesArray[l].noteDate) {
+              if (this.parentNode.parentNode.children[1].children[1].children[0].innerHTML === notesArray[l].noteTime) {
                 notesArray[l].noteActiveColor = this.style.backgroundColor;
               }
             }
@@ -289,7 +305,7 @@ function buildNote() {
 
         let deleteButton = document.createElement("button");
         deleteButton.innerHTML = '<img class="deleteButtonSvg" src="deleteIcon.svg" alt="deleteSVG">';
-        deleteButton.classList.add("note__delete");
+        deleteButton.classList.add("note__delete", "svg");
         deleteButton.onclick = function () {
           // console.log(this.parentNode.children[1].children[1].children[0].innerHTML);
           for (var i = 0; i < allNotesArr.length; i++) {
@@ -299,7 +315,7 @@ function buildNote() {
               let notesArray = allNotesArr[i].notes;
 
               for (var j = 0; j < notesArray.length; j++) {
-                if (this.parentNode.children[1].children[1].children[0].innerHTML === notesArray[j].noteDate) {
+                if (this.parentNode.children[1].children[1].children[0].innerHTML === notesArray[j].noteTime) {
                   let filteredArray = notesArray.filter((item) => item !== notesArray[j]);
                   notesArray = filteredArray;
                   allNotesArr[i].notes = notesArray;
@@ -319,6 +335,7 @@ function buildNote() {
       }
     }
   }
+  changeTheme();
 }
 
 ///////////////////// visibility func ///////////////////////
@@ -333,7 +350,6 @@ document.getElementById("menu__returnButton").addEventListener("click", function
   infoFunc();
 })
 
-// sredi kod nije najbolji // mozda moze switch
 function visibilityFunc() {
   // visibility toggle
   let categoryForm = document.getElementById("category");
@@ -341,7 +357,7 @@ function visibilityFunc() {
   let categoryDisplay = document.getElementById("categoryList");
   let noteDisplay = document.getElementById("noteList");
 
-  let noteToggle = false;
+  noteToggle = false;
 
   for (var i = 0; i < allNotesArr.length; i++) {
     if (allNotesArr[i].categoryActive === true) {
@@ -349,13 +365,13 @@ function visibilityFunc() {
     }
   }
   if (noteToggle === true) {
-    // category hidden notes visible
+    // category hidden / notes visible
     categoryForm.style.display = "none";
     categoryDisplay.style.display = "none";
     noteForm.style.display = "block";
     noteDisplay.style.display = "block";
   } else {
-    // category visible notes hidden
+    // category visible / notes hidden
     categoryForm.style.display = "block";
     categoryDisplay.style.display = "block";
     noteForm.style.display = "none";
@@ -367,12 +383,18 @@ function visibilityFunc() {
 
 function infoFunc() {
   let infoText = document.getElementById("info__text");
+
   let categoryNumber = 0;
   let categoryCheckedNumber = 0;
   let categoryLastTimeMade = 0;
   let categoryLastDateMade = 0;
-  let notesNumber = 0;
 
+  let notesNumber = 0;
+  let notesCheckedNumber = 0;
+  let noteLastTimeMade = 0;
+  let noteLastDateMade = 0;
+
+  ///// category info //////
   for (var i = 0; i < allNotesArr.length; i++) {
     // getting number of categories
     categoryNumber++;
@@ -387,7 +409,7 @@ function infoFunc() {
       categoryLastTimeMade = lastTime;
       categoryLastDateMade = lastDate;
     }
-    // date and time formattingd
+    // date and time formatting
     let timeOutput =
       categoryLastTimeMade.substring(0, 2) + ":" + categoryLastTimeMade.substring(2,4) + ":"
       + categoryLastTimeMade.substring(4,8);
@@ -396,19 +418,8 @@ function infoFunc() {
       categoryLastDateMade.substring(0, 2) + "/" + categoryLastDateMade.substring(2,4) + "/"
       + categoryLastDateMade.substring(4,8);
 
-    if (allNotesArr[i].categoryActive === true) {
-      // html info about notes
-      for (var i = 0; i < allNotesArr.length; i++) {
-        if (allNotesArr[i].categoryActive === true) {
-          for (var j = 0; j < allNotesArr[i].notes.length; j++) {
-            notesNumber++;
-          }
-        }
-      }
-      infoText.innerHTML = `number of notes  ${notesNumber}`;
-    }
-    else if (allNotesArr[i].categoryActive !== true) {
-      // html info about categories
+    if (allNotesArr[i].categoryActive !== true) {
+      // html info
       infoText.innerHTML =
       `<span class="infoTextColorSPan">${categoryNumber}</span>
       categories, with
@@ -419,14 +430,72 @@ function infoFunc() {
       <span class="infoTextColorSPan">${dateOutput}</span>`;
     }
   }
+
+  ///// notes info //////
+  if (noteToggle === true) {
+    let timeOutput = "?";
+    let dateOutput = "?";
+    for (var i = 0; i < allNotesArr.length; i++) {
+      if (allNotesArr[i].categoryActive === true) {
+        if (allNotesArr[i].notes.length > 0) {
+          for (var k = 0; k < allNotesArr[i].notes.length; k++) {
+            // getting last date of notes
+            let lastTime = allNotesArr[i].notes[k].noteTime.split(':').join('');
+            let lastDate = allNotesArr[i].notes[k].noteDate.split('/').join('');
+            if (lastDate + lastTime > noteLastDateMade) {
+              noteLastTimeMade = lastTime;
+              noteLastDateMade = lastDate;
+            }
+            // date and time formatting
+            timeOutput =
+              noteLastTimeMade.substring(0, 2) + ":" + noteLastTimeMade.substring(2,4) + ":"
+              + noteLastTimeMade.substring(4,8);
+
+            dateOutput =
+              noteLastDateMade.substring(0, 2) + "/" + noteLastDateMade.substring(2,4) + "/"
+              + noteLastDateMade.substring(4,8);
+          }
+        }
+        for (var i = 0; i < allNotesArr.length; i++) {
+          if (allNotesArr[i].categoryActive === true) {
+            for (var j = 0; j < allNotesArr[i].notes.length; j++) {
+              notesNumber++;
+            }
+            for (var b = 0; b < allNotesArr[i].notes.length; b++) {
+              if (allNotesArr[i].notes[b].noteCheck === true) {
+                notesCheckedNumber++;
+              }
+            }
+          }
+        }
+      }
+
+      // html info
+      infoText.innerHTML =
+      `<span class="infoTextColorSPan">${notesNumber}</span> notes, with
+      <span class="infoTextColorSPan">${notesCheckedNumber}</span> checked, last one at
+      <span class="infoTextColorSPan">${timeOutput}</span> on
+      <span class="infoTextColorSPan">${dateOutput}</span>`;
+    }
+  }
 }
 
 ///////////////////// dark/light theme toggle ///////////////////////
 
-document.getElementById("menu__themeButton").addEventListener("click", function(event) {
+document.getElementById("menu__themeButton").addEventListener("click", toggleTheme);
 
+function toggleTheme() {
   darkTheme = !darkTheme;
+  changeTheme();
+}
+
+function changeTheme() {
+
+  let allSvg = document.getElementsByClassName("svg");
   if (darkTheme) {
+    // lighten the bg color a little bit intead of the black root var
+    document.getElementsByTagName("BODY")[0].style.backgroundColor = "#1b1a1a";
+    // set the vars
     document.documentElement.style.setProperty('--color1', '#515151');
     document.documentElement.style.setProperty('--color2', '#000000');
     document.documentElement.style.setProperty('--color3', '#d9d9d9');
@@ -434,56 +503,14 @@ document.getElementById("menu__themeButton").addEventListener("click", function(
     document.documentElement.style.setProperty('--color5', '#ffffff');
     document.documentElement.style.setProperty('--color6', '#ed6088');
     // invert svg icons so that they are visible
-    document.getElementById("themeButtonSvg").style.filter = "invert(100%)";
-    document.getElementById("backButtonSvg").style.filter = "invert(100%)";
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // promeni src i updejtuj funkciju kad se napravi nova kategorija ili nota
-
-
-    let categoryDelete = document.getElementsByClassName("deleteButtonSvg");
-    let noteDelete = document.getElementsByClassName("deleteButtonSvg");
-    for (var i = 0; i < categoryDelete.length; i++) {
-      categoryDelete[i].style.filter = "invert(100%)";
+    for (var i = 0; i < allSvg.length; i++) {
+      allSvg[i].style.filter = "brightness(1000%)";
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   }
   if (!darkTheme) {
+    // lighten the bg color a little bit intead of the black root var
+    document.getElementsByTagName("BODY")[0].style.backgroundColor = "var(--color2)";
+    // set the vars
     document.documentElement.style.setProperty('--color1', '#ffffff');
     document.documentElement.style.setProperty('--color2', '#f4f4f4');
     document.documentElement.style.setProperty('--color3', '#d9d9d9');
@@ -491,32 +518,12 @@ document.getElementById("menu__themeButton").addEventListener("click", function(
     document.documentElement.style.setProperty('--color5', '#000000');
     document.documentElement.style.setProperty('--color6', '#d2315f');
     // reset the invert filter
-    document.getElementById("themeButtonSvg").style.filter = "invert(0%)";
-    document.getElementById("backButtonSvg").style.filter = "invert(0%)";
+    // invert svg icons so that they are visible
+    for (var i = 0; i < allSvg.length; i++) {
+      allSvg[i].style.filter = "brightness(100%)";
+    }
   }
-
-})
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}
 
 
 
