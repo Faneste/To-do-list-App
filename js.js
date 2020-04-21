@@ -19,7 +19,8 @@
 // neka ima loading screen za telefone sa logoom
 // sredi time kod, ima ga na dva mesta, stavi u jednu funk i da returnuje preko attr vreme (mozda kao uproscen  string)
 // moze i flash input da se extraktuje u posebnu funkciju
-let allNotesArr = []; let activeCategory; let categoryInput; let noteInput; let darkTheme = false; let noteToggle;
+let allNotesArr = []; let activeCategory; let categoryInput; let noteInput;
+let darkTheme = false; let noteToggle; visibilityFunc();
 
 ///////////////////// getting input ///////////////////////
 
@@ -164,10 +165,6 @@ function buildCategory() {
     let noteNumber = 0; let noteCheck = 0;
     for (var k = 0; k < item.notes.length; k++) {
       noteNumber++;
-      // sredi notechek, problem je undefined kad se ubaci druga nota u drugoj kategoriji
-      // if (item.notes[i].noteCheck !== "undefined" && item.notes[i].noteCheck === true) {
-      //     noteCheck++;
-      // }
     };
     categoryInfo.innerHTML =
     `<span class="category__info__span">
@@ -189,9 +186,12 @@ function buildCategory() {
     }
 
     let deleteButton = document.createElement("button");
-    deleteButton.innerHTML = '<img class="deleteButtonSvg" src="deleteIcon.svg" alt="deleteSVG">';
+    deleteButton.innerHTML = '<img class="deleteButtonSvg" src="icons/deleteIcon.svg" alt="deleteSVG">';
     deleteButton.classList.add("category__delete", "svg");
     deleteButton.onclick = function () {
+
+      console.log(this.parentNode);
+
       for (var i = 0; i < allNotesArr.length; i++) {
         if (this.parentNode.children[2].children[0].innerHTML === allNotesArr[i].categoryTime) {
           let filteredArray = allNotesArr.filter((item) => item !== allNotesArr[i]);
@@ -200,6 +200,10 @@ function buildCategory() {
           infoFunc();
         }
       }
+
+
+
+
     };
 
     categoryContainerSmall.appendChild(clickDiv);
@@ -253,6 +257,24 @@ function buildNote() {
         titleDateContainer.classList.add("note__titleDateContainer");
         titleDateContainer.appendChild(title);
         titleDateContainer.appendChild(date);
+        titleDateContainer.onclick = function () {
+          // toggle checkmark also when clicked on entire note
+          for (var i = 0; i < allNotesArr.length; i++) {
+            if (allNotesArr[i].categoryActive === true) {
+
+              // let activeNotes = allNotesArr[i];
+              let notesArray = allNotesArr[i].notes;
+
+              for (var j = 0; j < notesArray.length; j++) {
+                if (this.parentNode.children[1].children[1].children[0].innerHTML === notesArray[j].noteTime) {
+                  notesArray[j].noteCheck = !notesArray[j].noteCheck;
+                }
+              }
+            }
+          }
+          buildNote();
+          infoFunc();
+        }
 
         let checkbox = document.createElement('input');
         checkbox.type = "checkbox";
@@ -262,7 +284,7 @@ function buildNote() {
           for (var i = 0; i < allNotesArr.length; i++) {
             if (allNotesArr[i].categoryActive === true) {
 
-              let activeNotes = allNotesArr[i];
+              // let activeNotes = allNotesArr[i];
               let notesArray = allNotesArr[i].notes;
 
               for (var j = 0; j < notesArray.length; j++) {
@@ -277,7 +299,7 @@ function buildNote() {
         }
 
         let colorButton = document.createElement("button");
-        colorButton.innerHTML = '<img class="colorButtonSvg" src="colorIcon.svg" alt="colorSVG">';
+        colorButton.innerHTML = '<img class="colorButtonSvg" src="icons/colorIcon.svg" alt="colorSVG">';
         colorButton.classList.add("note__color", "svg");
         colorButton.onclick = function() {
           this.parentNode.children[4].style.display = this.parentNode.children[4].style.display === 'block' ? '' : 'block';
@@ -304,14 +326,14 @@ function buildNote() {
         }
 
         let deleteButton = document.createElement("button");
-        deleteButton.innerHTML = '<img class="deleteButtonSvg" src="deleteIcon.svg" alt="deleteSVG">';
+        deleteButton.innerHTML = '<img class="deleteButtonSvg" src="icons/deleteIcon.svg" alt="deleteSVG">';
         deleteButton.classList.add("note__delete", "svg");
         deleteButton.onclick = function () {
           // console.log(this.parentNode.children[1].children[1].children[0].innerHTML);
           for (var i = 0; i < allNotesArr.length; i++) {
             if (allNotesArr[i].categoryActive === true) {
 
-              let activeNotes = allNotesArr[i];
+              // let activeNotes = allNotesArr[i];
               let notesArray = allNotesArr[i].notes;
 
               for (var j = 0; j < notesArray.length; j++) {
@@ -337,6 +359,41 @@ function buildNote() {
   }
   changeTheme();
 }
+
+///////////////////// delete checked notes/categories ///////////////////////
+
+document.getElementById("menu__checkedButton").addEventListener("click", function(event) {
+
+  // optimizuj ovo moze samo jedan loop da bude
+
+  // if categories visible then delete Categories // if notes visible then delete notes
+  if (noteToggle === false) {
+    let uncheckedArray = [];
+    for (var i = 0; i < allNotesArr.length; i++) {
+      if (allNotesArr[i].categoryCheck !== true) {
+        uncheckedArray.push(allNotesArr[i]);
+      }
+    }
+    allNotesArr = uncheckedArray;
+  }
+  if (noteToggle === true) {
+    for (var b = 0; b < allNotesArr.length; b++) {
+      if (allNotesArr[b].categoryActive === true) {
+        let notesArray = allNotesArr[b].notes;
+        notesArray.forEach(function(item){
+          if (item.noteCheck === true) {
+            let filteredArray = notesArray.filter((item2) => item2 !== item);
+            notesArray = filteredArray;
+            allNotesArr[b].notes = notesArray;
+          }
+        })
+      }
+    }
+  }
+  buildCategory();
+  buildNote();
+  infoFunc();
+})
 
 ///////////////////// visibility func ///////////////////////
 
@@ -370,12 +427,17 @@ function visibilityFunc() {
     categoryDisplay.style.display = "none";
     noteForm.style.display = "block";
     noteDisplay.style.display = "block";
+    // back button visible
+    document.getElementById("menu__returnButton").style.opacity = "100%";
+
   } else {
     // category visible / notes hidden
     categoryForm.style.display = "block";
     categoryDisplay.style.display = "block";
     noteForm.style.display = "none";
     noteDisplay.style.display = "none";
+    // back button not visible
+    document.getElementById("menu__returnButton").style.opacity = "10%";
   }
 }
 
@@ -422,9 +484,9 @@ function infoFunc() {
       // html info
       infoText.innerHTML =
       `<span class="infoTextColorSPan">${categoryNumber}</span>
-      categories, with
+      categories,
       <span class="infoTextColorSPan">${categoryCheckedNumber}</span>
-      checked, last one at
+      checked, last one
       <span class="infoTextColorSPan">${timeOutput}</span>
       on
       <span class="infoTextColorSPan">${dateOutput}</span>`;
@@ -524,11 +586,6 @@ function changeTheme() {
     }
   }
 }
-
-
-
-
-
 
 
 //
