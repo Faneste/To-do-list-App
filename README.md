@@ -2,7 +2,7 @@
 
 To Do List App for creating different categories and notes within them. It has an original UI design.
 
-![To Do List logo](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Logo Title Text 1")
+![To Do List logo](https://github.com/Faneste/To-do-list-App/blob/master/design/logo.jpg "To Do List App logo")
 
 Options
 * Checkmarking
@@ -12,6 +12,6 @@ Options
 
 To Do List App has light and dark theme.
 
-
+![To Do List logo](https://github.com/Faneste/To-do-list-App/blob/master/design/dark-light-theme.jpg "Dark and Light theme")
 
 Made using vanilla Javascript with the help of [Animate css](https://daneden.github.io/animate.css/) for the animations.
