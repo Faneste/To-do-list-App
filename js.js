@@ -348,33 +348,36 @@ function dateFormat() {
 
 document.getElementById("menu__checkedButton").addEventListener("click", function(event) {
   // if categories visible then delete Categories
-  if (!noteToggle) {
-    let uncheckedArray = [];
-    for (var i = 0; i < allNotesArr.length; i++) {
-      if (allNotesArr[i].categoryCheck !== true) {
-        uncheckedArray.push(allNotesArr[i]);
+  let confirm2 = confirm("Delete all checked messages?");
+  if (confirm2 == true) {
+    if (!noteToggle) {
+      let uncheckedArray = [];
+      for (var i = 0; i < allNotesArr.length; i++) {
+        if (allNotesArr[i].categoryCheck !== true) {
+          uncheckedArray.push(allNotesArr[i]);
+        }
+      }
+      allNotesArr = uncheckedArray;
+    }
+    // if notes visible then delete notes
+    if (noteToggle) {
+      for (var b = 0; b < allNotesArr.length; b++) {
+        if (allNotesArr[b].categoryActive) {
+          let notesArray = allNotesArr[b].notes;
+          notesArray.forEach(function(item) {
+            if (item.noteCheck) {
+              let filteredArray = notesArray.filter((item2) => item2 !== item);
+              notesArray = filteredArray;
+              allNotesArr[b].notes = notesArray;
+            }
+          })
+        }
       }
     }
-    allNotesArr = uncheckedArray;
+    buildCategory();
+    buildNote();
+    infoFunc();
   }
-  // if notes visible then delete notes
-  if (noteToggle) {
-    for (var b = 0; b < allNotesArr.length; b++) {
-      if (allNotesArr[b].categoryActive) {
-        let notesArray = allNotesArr[b].notes;
-        notesArray.forEach(function(item){
-          if (item.noteCheck) {
-            let filteredArray = notesArray.filter((item2) => item2 !== item);
-            notesArray = filteredArray;
-            allNotesArr[b].notes = notesArray;
-          }
-        })
-      }
-    }
-  }
-  buildCategory();
-  buildNote();
-  infoFunc();
 })
 
 ///////////////////// visibility func ///////////////////////
