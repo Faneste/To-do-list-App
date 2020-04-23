@@ -1,26 +1,5 @@
-// iskoristi underscore js
-// mozes i animacije da ubacis sa animate
-// nek samo dodaje boje razlicite za kategorije sa opcijom da ti menjas ako hoces // mogu za boje da ima meni umesto color wheel\
-// neka dizajn za boje bude samo linija oko notes zbog tamne teme
-// nek ima precrtani tekst ako je checkirano
-// stavi dark i light mode samo za pozadinu // moze jedna okrugla ikonica i toggle
-// moze broj kategorija i broj checkiranih i nechekiranih i datum zadnjeg unosa
-// kategorija moze da ima informacije o broju notes u sebi datumu
-// return moze da bude floating button sa fixed pozicijom
-// neka nota bude malo duza od kategorije u zavisnosti od teksta
-// neka note input ima border ruzicasti ili nesto slicno da se razlikuje
-// neka prvo slovo bude veliko u inputu
-// za dizajn moze neka trakasta pozadina posto izgleda prazno
-// sredi foldere za fajlove, neka ikonice imaju poseban folder
-// spoj css klase i id za category i note, kod se bespotrebno ponavlja
-// nek se ne vidi back dugme u kategorijama / stavi u visibility function
-// neka prikaze no notes yet ili categories
-// neka notes kada se klikne na celo polje da checkmarkuje, da ne mora tacno na checkmark da se klikce
-// neka ima loading screen za telefone sa logoom
-// sredi time kod, ima ga na dva mesta, stavi u jednu funk i da returnuje preko attr vreme (mozda kao uproscen  string)
-// moze i flash input da se extraktuje u posebnu funkciju
-let allNotesArr = []; let activeCategory; let categoryInput; let noteInput;
-let darkTheme = false; let noteToggle; visibilityFunc();
+let noteToggle, activeCategory, categoryInput, noteInput; let allNotesArr = [];
+let darkTheme = false; visibilityFunc(); placeHolder("categoryList", "category__container", "category");
 
 ///////////////////// getting input ///////////////////////
 
@@ -30,37 +9,21 @@ document.getElementById("category__submitbutton").addEventListener("click", func
   categoryInput = document.getElementById("category__textarea").value;
   categoryInput = categoryInput.charAt(0).toUpperCase() + categoryInput.slice(1);
 
-  // time formatting, add zero if time is 10:2:22 for example
-  time = new Date();
-  let hours = (time.getHours()<10?'0':'') + time.getHours();
-  let minutes = (time.getMinutes()<10?'0':'') + time.getMinutes();
-  let seconds = (time.getSeconds()<10?'0':'') + time.getSeconds();
-  // date formatting
-  let dd = String(time.getDate()).padStart(2, '0');
-  let mm = String(time.getMonth() + 1).padStart(2, '0');
-  let yyyy = time.getFullYear();
-  let date = dd + '/' + mm + '/' + yyyy;
-
-  // if there's an text in input
   if (categoryInput !== "") {
     allNotesArr.push({
       categoryTitle:categoryInput,
-      categoryTime: hours + ":" + minutes + ":" + seconds,
-      categoryDate: date,
+      categoryTime: timeFormat(),
+      categoryDate: dateFormat(),
       categoryCheck: false,
       categoryActive: false,
-      notes: []
+      notes: [],
     });
     buildCategory();
     buildNote();
     infoFunc();
   } else {
     // flash input if empty
-    var t = setInterval(function () {
-    var ele = document.getElementById("category__textarea");
-      ele.style.visibility  = (ele.style.visibility  == "hidden" ? "" : "hidden");
-    }, 100);
-    setTimeout(function( ) { clearInterval( t ); }, 600);
+    flashInput("category__textarea");
   }
   document.getElementById("category__textarea").value = "";
 });
@@ -71,21 +34,10 @@ document.getElementById("note__submitbutton").addEventListener("click", function
   noteInput = document.getElementById("note__textarea").value;
   noteInput = noteInput.charAt(0).toUpperCase() + noteInput.slice(1);
 
-  // time formatting, add zero if time is 10:2:22 for example
-  time = new Date();
-  let hours = (time.getHours()<10?'0':'') + time.getHours();
-  let minutes = (time.getMinutes()<10?'0':'') + time.getMinutes();
-  let seconds = (time.getSeconds()<10?'0':'') + time.getSeconds();
-  // date formatting
-  let dd = String(time.getDate()).padStart(2, '0');
-  let mm = String(time.getMonth() + 1).padStart(2, '0');
-  let yyyy = time.getFullYear();
-  let date = dd + '/' + mm + '/' + yyyy;
-
   let noteInputObject = {
     noteText: noteInput,
-    noteTime: hours + ":" + minutes + ":" + seconds,
-    noteDate: date,
+    noteTime: timeFormat(),
+    noteDate: dateFormat(),
     noteCheck: false,
     noteActiveColor: "#d2315f",
     noteColors: ["#0060af", "#29b013", "#c51021", "#e87d0b"]
@@ -102,11 +54,7 @@ document.getElementById("note__submitbutton").addEventListener("click", function
     infoFunc();
   } else {
     // flash input if empty
-    var t = setInterval(function () {
-    var ele = document.getElementById("note__textarea");
-      ele.style.visibility  = (ele.style.visibility  == "hidden" ? "" : "hidden");
-    }, 100);
-    setTimeout(function( ) { clearInterval( t ); }, 600);
+    flashInput("note__textarea");
   }
   document.getElementById("note__textarea").value = "";
 });
@@ -115,7 +63,6 @@ document.getElementById("note__submitbutton").addEventListener("click", function
 
 // build category html
 function buildCategory() {
-
   // deletes old html and builds a new updated one
   let nodeDelete = document.getElementsByClassName("category__container");
   // backwards loop bcs index of html element is changing with html coll.
@@ -124,8 +71,10 @@ function buildCategory() {
     nodeDelete[0].remove();
   }
 
-  allNotesArr.forEach((item, i) => {
+  // if category empty build "create new" placeholder
+  if (allNotesArr.length === 0) { placeHolder("categoryList", "category__container", "category") };
 
+  allNotesArr.forEach((item, i) => {
     let categoryContainerMain = document.getElementById("categoryList");
 
     let categoryContainerSmall = document.createElement("div");
@@ -189,21 +138,15 @@ function buildCategory() {
     deleteButton.innerHTML = '<img class="deleteButtonSvg" src="icons/deleteIcon.svg" alt="deleteSVG">';
     deleteButton.classList.add("category__delete", "svg");
     deleteButton.onclick = function () {
-
-      console.log(this.parentNode);
-
+      this.parentNode.classList.add( "animated", "zoomOut");
       for (var i = 0; i < allNotesArr.length; i++) {
         if (this.parentNode.children[2].children[0].innerHTML === allNotesArr[i].categoryTime) {
           let filteredArray = allNotesArr.filter((item) => item !== allNotesArr[i]);
           allNotesArr = filteredArray;
-          buildCategory();
-          infoFunc();
+          // delay rebuild for the animation to play out
+          setTimeout(function() { buildCategory(); infoFunc(); }, 500);
         }
       }
-
-
-
-
     };
 
     categoryContainerSmall.appendChild(clickDiv);
@@ -228,6 +171,9 @@ function buildNote() {
 
   for (var i = 0; i < allNotesArr.length; i++) {
     if (allNotesArr[i].categoryActive === true) {
+
+      // if note empty build "create new" placeholder
+      if (allNotesArr[i].notes.length === 0) { placeHolder("noteList", "note__container", "note"); };
 
       let notesArray = allNotesArr[i].notes;
       for (var j = 0; j < notesArray.length; j++) {
@@ -261,10 +207,7 @@ function buildNote() {
           // toggle checkmark also when clicked on entire note
           for (var i = 0; i < allNotesArr.length; i++) {
             if (allNotesArr[i].categoryActive === true) {
-
-              // let activeNotes = allNotesArr[i];
               let notesArray = allNotesArr[i].notes;
-
               for (var j = 0; j < notesArray.length; j++) {
                 if (this.parentNode.children[1].children[1].children[0].innerHTML === notesArray[j].noteTime) {
                   notesArray[j].noteCheck = !notesArray[j].noteCheck;
@@ -283,10 +226,7 @@ function buildNote() {
         checkbox.onclick = function() {
           for (var i = 0; i < allNotesArr.length; i++) {
             if (allNotesArr[i].categoryActive === true) {
-
-              // let activeNotes = allNotesArr[i];
               let notesArray = allNotesArr[i].notes;
-
               for (var j = 0; j < notesArray.length; j++) {
                 if (this.parentNode.children[1].children[1].children[0].innerHTML === notesArray[j].noteTime) {
                   notesArray[j].noteCheck = !notesArray[j].noteCheck;
@@ -329,19 +269,17 @@ function buildNote() {
         deleteButton.innerHTML = '<img class="deleteButtonSvg" src="icons/deleteIcon.svg" alt="deleteSVG">';
         deleteButton.classList.add("note__delete", "svg");
         deleteButton.onclick = function () {
-          // console.log(this.parentNode.children[1].children[1].children[0].innerHTML);
+          this.parentNode.classList.add( "animated", "zoomOut");
           for (var i = 0; i < allNotesArr.length; i++) {
             if (allNotesArr[i].categoryActive === true) {
-
-              // let activeNotes = allNotesArr[i];
               let notesArray = allNotesArr[i].notes;
-
               for (var j = 0; j < notesArray.length; j++) {
                 if (this.parentNode.children[1].children[1].children[0].innerHTML === notesArray[j].noteTime) {
                   let filteredArray = notesArray.filter((item) => item !== notesArray[j]);
                   notesArray = filteredArray;
                   allNotesArr[i].notes = notesArray;
-                  buildNote();
+                  // delay rebuild for the animation to play out
+                  setTimeout(function() { buildNote(); infoFunc(); }, 500);
                 }
               }
             }
@@ -360,14 +298,57 @@ function buildNote() {
   changeTheme();
 }
 
+//////////// create placeholder if category/notes are empty ////////////
+
+function placeHolder(container, tempContainer, typeAttr) {
+  let containerMain = document.getElementById(container);
+
+  let placeHolderContainer = document.createElement("div");
+  placeHolderContainer.classList.add(tempContainer);
+  let placeHolderText = document.createElement("h3");
+  placeHolderText.id = "placeholder__text";
+  placeHolderText.innerHTML = `Create new ${typeAttr}`;
+
+  placeHolderContainer.appendChild(placeHolderText);
+  containerMain.appendChild(placeHolderContainer);
+}
+
+///////////////////// flash input if empty ///////////////////////
+
+// flash input if empty
+function flashInput(elementId) {
+  var t = setInterval(function () {
+  var ele = document.getElementById(elementId);
+    ele.style.visibility  = (ele.style.visibility  == "hidden" ? "" : "hidden");
+  }, 100);
+  setTimeout(function( ) { clearInterval( t ); }, 600);
+}
+
+///////////////////// time formatting ///////////////////////
+
+// time formatting, add zero if time is 10:2:22 for example
+function timeFormat() {
+  time = new Date();
+  let hours = (time.getHours()<10?'0':'') + time.getHours();
+  let minutes = (time.getMinutes()<10?'0':'') + time.getMinutes();
+  let seconds = (time.getSeconds()<10?'0':'') + time.getSeconds();
+  return hours + ":" + minutes + ":" + seconds;
+}
+
+// date formatting
+function dateFormat() {
+  time = new Date();
+  let dd = String(time.getDate()).padStart(2, '0');
+  let mm = String(time.getMonth() + 1).padStart(2, '0');
+  let yyyy = time.getFullYear();
+  return dd + '/' + mm + '/' + yyyy;
+}
+
 ///////////////////// delete checked notes/categories ///////////////////////
 
 document.getElementById("menu__checkedButton").addEventListener("click", function(event) {
-
-  // optimizuj ovo moze samo jedan loop da bude
-
-  // if categories visible then delete Categories // if notes visible then delete notes
-  if (noteToggle === false) {
+  // if categories visible then delete Categories
+  if (!noteToggle) {
     let uncheckedArray = [];
     for (var i = 0; i < allNotesArr.length; i++) {
       if (allNotesArr[i].categoryCheck !== true) {
@@ -376,12 +357,13 @@ document.getElementById("menu__checkedButton").addEventListener("click", functio
     }
     allNotesArr = uncheckedArray;
   }
-  if (noteToggle === true) {
+  // if notes visible then delete notes
+  if (noteToggle) {
     for (var b = 0; b < allNotesArr.length; b++) {
-      if (allNotesArr[b].categoryActive === true) {
+      if (allNotesArr[b].categoryActive) {
         let notesArray = allNotesArr[b].notes;
         notesArray.forEach(function(item){
-          if (item.noteCheck === true) {
+          if (item.noteCheck) {
             let filteredArray = notesArray.filter((item2) => item2 !== item);
             notesArray = filteredArray;
             allNotesArr[b].notes = notesArray;
@@ -401,10 +383,13 @@ document.getElementById("menu__returnButton").addEventListener("click", function
   for (var i = 0; i < allNotesArr.length; i++) {
     allNotesArr[i].categoryActive = false;
   }
+  // delay display for the animation to play out
+  setTimeout(function() {
+    buildCategory();
+    buildNote();
+    infoFunc();
+  }, 500);
   visibilityFunc();
-  buildCategory();
-  buildNote();
-  infoFunc();
 })
 
 function visibilityFunc() {
@@ -417,25 +402,38 @@ function visibilityFunc() {
   noteToggle = false;
 
   for (var i = 0; i < allNotesArr.length; i++) {
-    if (allNotesArr[i].categoryActive === true) {
+    if (allNotesArr[i].categoryActive) {
       noteToggle = true;
     }
   }
-  if (noteToggle === true) {
+  if (noteToggle) {
     // category hidden / notes visible
-    categoryForm.style.display = "none";
-    categoryDisplay.style.display = "none";
-    noteForm.style.display = "block";
-    noteDisplay.style.display = "block";
+    categoryDisplay.classList.remove( "animated", "bounceInLeft");
+    categoryDisplay.classList.add( "animated", "bounceOutLeft");
+    noteDisplay.classList.remove( "animated", "bounceOutRight");
+    noteDisplay.classList.add( "animated", "bounceInRight");
+    // delay display for the animation to play out
+    setTimeout(function() {
+      categoryForm.style.display = "none";
+      categoryDisplay.style.display = "none";
+      noteForm.style.display = "block";
+      noteDisplay.style.display = "block";
+    }, 300);
     // back button visible
     document.getElementById("menu__returnButton").style.opacity = "100%";
-
   } else {
     // category visible / notes hidden
-    categoryForm.style.display = "block";
-    categoryDisplay.style.display = "block";
-    noteForm.style.display = "none";
-    noteDisplay.style.display = "none";
+    categoryDisplay.classList.remove( "animated", "bounceOutLeft");
+    categoryDisplay.classList.add( "animated", "bounceInLeft");
+    noteDisplay.classList.remove( "animated", "bounceInRight");
+    noteDisplay.classList.add( "animated", "bounceOutRight");
+    // delay display for the animation to play out
+    setTimeout(function() {
+      categoryForm.style.display = "block";
+      categoryDisplay.style.display = "block";
+      noteForm.style.display = "none";
+      noteDisplay.style.display = "none";
+    }, 300);
     // back button not visible
     document.getElementById("menu__returnButton").style.opacity = "10%";
   }
@@ -460,7 +458,7 @@ function infoFunc() {
   for (var i = 0; i < allNotesArr.length; i++) {
     // getting number of categories
     categoryNumber++;
-    if (allNotesArr[i].categoryCheck === true) {
+    if (allNotesArr[i].categoryCheck) {
       categoryCheckedNumber++;
     }
 
@@ -480,7 +478,7 @@ function infoFunc() {
       categoryLastDateMade.substring(0, 2) + "/" + categoryLastDateMade.substring(2,4) + "/"
       + categoryLastDateMade.substring(4,8);
 
-    if (allNotesArr[i].categoryActive !== true) {
+    if (!allNotesArr[i].categoryActive) {
       // html info
       infoText.innerHTML =
       `<span class="infoTextColorSPan">${categoryNumber}</span>
@@ -494,11 +492,11 @@ function infoFunc() {
   }
 
   ///// notes info //////
-  if (noteToggle === true) {
+  if (noteToggle) {
     let timeOutput = "?";
     let dateOutput = "?";
     for (var i = 0; i < allNotesArr.length; i++) {
-      if (allNotesArr[i].categoryActive === true) {
+      if (allNotesArr[i].categoryActive) {
         if (allNotesArr[i].notes.length > 0) {
           for (var k = 0; k < allNotesArr[i].notes.length; k++) {
             // getting last date of notes
@@ -552,7 +550,6 @@ function toggleTheme() {
 }
 
 function changeTheme() {
-
   let allSvg = document.getElementsByClassName("svg");
   if (darkTheme) {
     // lighten the bg color a little bit intead of the black root var
@@ -565,9 +562,7 @@ function changeTheme() {
     document.documentElement.style.setProperty('--color5', '#ffffff');
     document.documentElement.style.setProperty('--color6', '#ed6088');
     // invert svg icons so that they are visible
-    for (var i = 0; i < allSvg.length; i++) {
-      allSvg[i].style.filter = "brightness(1000%)";
-    }
+    for (var i = 0; i < allSvg.length; i++) { allSvg[i].style.filter = "brightness(1000%)"; }
   }
   if (!darkTheme) {
     // lighten the bg color a little bit intead of the black root var
@@ -581,11 +576,18 @@ function changeTheme() {
     document.documentElement.style.setProperty('--color6', '#d2315f');
     // reset the invert filter
     // invert svg icons so that they are visible
-    for (var i = 0; i < allSvg.length; i++) {
-      allSvg[i].style.filter = "brightness(100%)";
-    }
+    for (var i = 0; i < allSvg.length; i++) { allSvg[i].style.filter = "brightness(100%)"; }
   }
 }
 
+///////////////////// intro logo animation ///////////////////////
+
+let introLogo = setInterval(function() {
+  document.getElementById("logoContainer__svg").classList.add( "animated", "bounceOutUp");
+}, 1000);
+
+let introBackground = setInterval(function() {
+  document.getElementById("logoContainer").style.display = "none";
+}, 1700);
 
 //
