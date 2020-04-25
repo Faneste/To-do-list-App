@@ -111,14 +111,17 @@ function buildCategory() {
     date.classList.add("category__date");
 
     let categoryInfo = document.createElement("h3");
-    let noteNumber = 0; let noteCheck = 0;
+    let noteNumber = 0; let noteChecked = 0;
     for (var k = 0; k < item.notes.length; k++) {
       noteNumber++;
+      if (item.notes[k].noteCheck === true) {
+        noteChecked++;
+      }
     };
     categoryInfo.innerHTML =
     `<span class="category__info__span">
     ${noteNumber}</span> notes /
-    <span class="category__info__span">${noteCheck}</span> checked`;
+    <span class="category__info__span">${noteChecked}</span> checked`;
     categoryInfo.classList.add("category__info");
 
     let checkbox = document.createElement('input');
@@ -592,5 +595,35 @@ let introLogo = setInterval(function() {
 let introBackground = setInterval(function() {
   document.getElementById("logoContainer").style.display = "none";
 }, 1700);
+
+///////////////////// local storage ///////////////////////
+
+window.onunload = function() {
+  localStorage.removeItem('noteStorage');
+  localStorage.setItem("noteStorage", JSON.stringify(allNotesArr));
+
+  localStorage.removeItem('theme');
+  localStorage.setItem("theme", darkTheme);
+};
+
+window.onload = function () {
+  if (localStorage.getItem('noteStorage') !== null) {
+    let storage = localStorage.getItem('noteStorage');
+    allNotesArr = JSON.parse(storage);
+
+    darkTheme = JSON.parse(localStorage.getItem('theme'));
+
+    buildCategory();
+    buildNote();
+    infoFunc();
+  }
+}
+
+
+
+
+
+
+
 
 //

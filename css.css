@@ -39,7 +39,8 @@ body {
 
 #logoContainer__svg {
   margin-top: 30%;
-  width: 90%;
+  width: 300px;
+  height: auto;
 }
 
 /* ////////////// main container ///////////////// */
@@ -303,12 +304,22 @@ body {
 
 #categoryList {
   grid-area: notes;
-  height: auto;
   margin-top: 10px;
-  /* border: 1px solid blue; */
-  overflow: hidden;
+  height: 70vh;
+  overflow: scroll;
+  overflow-x: hidden;
   background-color: var(--color1);
   border-radius: var(--borderRadius);
+}
+
+.category__container {
+  position: relative;
+  cursor: pointer;
+  padding: 7px;
+  padding-bottom: 20px;
+  border-bottom: 3px solid var(--color3);
+  background-color: var(--color1);
+  z-index: 10;
 }
 
 .category__clickDiv {
@@ -327,14 +338,6 @@ body {
   font-size: 1.1em;
 }
 
-.category__container {
-  position: relative;
-  cursor: pointer;
-  padding: 7px;
-  border-bottom: 3px solid var(--color3);
-  background-color: var(--color1);
-  z-index: 10;
-}
 
 .category__title {
   margin: 0;
@@ -398,9 +401,10 @@ input[type=checkbox] {
 #noteList {
   display: none;
   grid-area: notes;
-  height: auto;
   margin-top: 10px;
-  overflow: hidden;
+  height: 70vh;
+  overflow: scroll;
+  overflow-x: hidden;
   background-color: var(--color1);
   border-radius: var(--borderRadius);
 }
