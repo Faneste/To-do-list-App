@@ -2,6 +2,9 @@
 html {
   box-sizing: border-box;
   min-width: 320px;
+  width: 350px;
+  height: 300px;
+  border: 1px solid red;
 }
 /* uklanja default padding i margine */
 body {
@@ -9,11 +12,11 @@ body {
   font-family: 'Open Sans', sans-serif;
   padding: 0;
   margin: 0;
-  background-image: url("graphics/background.svg");
+  /* background-image: url("graphics/background.svg");
   background-repeat: no-repeat;
   background-position: center bottom;
   background-color: var(--color2);
-  background-size: 100%;
+  background-size: 500px; */
 }
 
 :root {
@@ -26,6 +29,16 @@ body {
   --borderRadius: 5px;
 }
 
+/* version p */
+#version {
+  position: fixed;
+  color: var(--color5);
+  font-size: 0.7em;
+  margin: 0;
+  text-align: center;
+  /* margin: 0px auto; */
+  bottom: 3px;
+}
 /* ////////////// logo intro ///////////////// */
 
 #logoContainer {
@@ -38,7 +51,7 @@ body {
 }
 
 #logoContainer__svg {
-  margin-top: 30%;
+  margin-top: 100px;
   width: 300px;
   height: auto;
 }
@@ -306,7 +319,7 @@ body {
   grid-area: notes;
   margin-top: 10px;
   height: 70vh;
-  overflow: scroll;
+  overflow: auto;
   overflow-x: hidden;
   background-color: var(--color1);
   border-radius: var(--borderRadius);

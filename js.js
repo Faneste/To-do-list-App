@@ -572,7 +572,7 @@ function changeTheme() {
   }
   if (!darkTheme) {
     // lighten the bg color a little bit intead of the black root var
-    document.getElementsByTagName("BODY")[0].style.backgroundColor = "var(--color2)";
+    document.getElementsByTagName("BODY")[0].style.backgroundColor = "var(--color3)";
     // set the vars
     document.documentElement.style.setProperty('--color1', '#ffffff');
     document.documentElement.style.setProperty('--color2', '#f4f4f4');
