@@ -4,13 +4,13 @@ To Do List App for creating different categories and notes within them. It has a
 
 ![To Do List logo](https://github.com/Faneste/To-do-list-App/blob/master/design/logo.jpg "To Do List App logo")
 
-Options
+## Options
 * Checkmarking
 * Deleting multiple checkmarked categories and notes
 * Changing color of notes
 * Dark and light app theme
 
-To Do List App has light and dark theme.
+### To Do List App has light and dark theme.
 
 ![To Do List logo](https://github.com/Faneste/To-do-list-App/blob/master/design/dark-light-theme.jpg "Dark and Light theme")
 
